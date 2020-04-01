@@ -3,5 +3,5 @@ This program calculates the speciation of gases produced by volcano by solving g
 
 "functions.py" contains the master function "solve_gases" which calculates gas-melt and gas-gas equilibrium.
 
-This all is for a paper I am currently working on. I will be updating this Github page as I finish up the paper.
+I will be updating this Github page as I finish up this project.
 
