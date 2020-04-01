@@ -1,5 +1,5 @@
 # Volcano-Speciation
-This program calculates the speciation of gases produced by volcano by solving gas-melt and gas-gas equilibrium. The model is explained in the Jupyter notebook file titled "Explanation_of_model," and also in "methods_github.pdf". Note that "methods_github.pdf" is a rough draft, yet it should still be understandable.
+This program calculates the speciation of gases produced by volcano by solving gas-melt and gas-gas equilibrium. The model is explained in the Jupyter notebook file titled "Explanation_of_model," and also in "methods_updated.pdf". Note that "methods_updated.pdf" is a rough draft, yet it should still be understandable.
 
 "functions.py" contains the master function "solve_gases" which calculates gas-melt and gas-gas equilibrium.
 
