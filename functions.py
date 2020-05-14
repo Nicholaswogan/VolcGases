@@ -143,15 +143,16 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
         if alphaG<0:
             sys.exit('alphaG is negative')
     except:
+        alphaG = 0.1
         init_cond1 = [np.log(x_H2O),np.log(x_CO2),np.log(P_H2O),np.log(P_CO2),np.log(alphaG),np.log(P_H2),np.log(P_CH4),np.log(P_CO)]
         sol1 = optimize.root(system1,init_cond1,method='lm',options={'maxiter': 10000})
         error1 = np.linalg.norm(system1(sol1['x']))
-        if error1>tol or sol1['success']==False:
-            print(error)
-            print(sol1)
-            sys.exit('Convergence issues!')
         ln_x_H2O,ln_x_CO2,ln_P_H2O,ln_P_CO2,ln_alphaG,ln_P_H2,ln_P_CH4,ln_P_CO = sol1['x']
         alphaG = np.exp(ln_alphaG)
+        if (error1>tol and alphaG>1e-4) or sol1['success']==False:
+            print(error1)
+            print(sol1)
+            sys.exit('Convergence issues!')
 
     return (np.exp(ln_P_H2O),np.exp(ln_P_H2),np.exp(ln_P_CO2),np.exp(ln_P_CO),\
            np.exp(ln_P_CH4),alphaG,np.exp(ln_x_CO2),np.exp(ln_x_H2O))
