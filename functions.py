@@ -70,6 +70,23 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
                 np.log(C1)+ln_H2O-ln_H2,\
                 np.log(C2)+ln_CO2-ln_CO,\
                 np.log(C3)+ln_CO2+2*ln_H2O-ln_CH4)
+
+    def jacob(y):
+        lnxH2O,lnxCO2,lnPH2O,lnPCO2,alphaG,lnPH2,lnPCH4,lnPCO = y
+        return np.array( [np.array( [0,0,( np.e )**( lnPH2O ),( np.e )**( lnPCO2 \
+                ),0,( np.e )**( lnPH2 ),( np.e )**( lnPCH4 ),( np.e )**( lnPCO ),] \
+                ),np.array( [d_H2O * ( np.e )**( lnxH2O ),-1,0,a_CO2,0,0,0,0,] \
+                ),np.array( [-1,0,a_H2O,0,0,0,0,0,] ),np.array( [( 1 + -1 * alphaG ) * \
+                ( np.e )**( lnxH2O ) * P,0,alphaG * ( np.e )**( lnPH2O ),0,( 2 * ( \
+                np.e )**( lnPCH4 ) + ( ( np.e )**( lnPH2 ) + ( ( np.e )**( lnPH2O ) + \
+                -1 * ( np.e )**( lnxH2O ) * P ) ) ),alphaG * ( np.e )**( lnPH2 ),2 * \
+                alphaG * ( np.e )**( lnPCH4 ),0,] ),np.array( [0,( 1 + -1 * alphaG ) \
+                * ( np.e )**( lnxCO2 ) * P,0,alphaG * ( np.e )**( lnPCO2 ),( ( np.e \
+                )**( lnPCH4 ) + ( ( np.e )**( lnPCO ) + ( ( np.e )**( lnPCO2 ) + -1 * \
+                ( np.e )**( lnxCO2 ) * P ) ) ),0,alphaG * ( np.e )**( lnPCH4 ),alphaG \
+                * ( np.e )**( lnPCO ),] ),np.array( [0,0,1,0,0,-1,0,0,] ),np.array( \
+                [0,0,0,1,0,0,0,-1,] ),np.array( [0,0,2,1,0,0,-1,0,] ),] )
+
     # the system of equtions written slightly differently
     def system1(y):
         ln_x_H2O,ln_x_CO2,ln_H2O,ln_CO2,lnalphaG,ln_H2,ln_CH4,ln_CO = y
@@ -81,6 +98,21 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
                 np.log(C1)+ln_H2O-ln_H2,\
                 np.log(C2)+ln_CO2-ln_CO,\
                 np.log(C3)+ln_CO2+2*ln_H2O-ln_CH4)
+
+    def jacob1(y):
+        ln_x_H2O,ln_x_CO2,ln_H2O,ln_CO2,lnalphaG,ln_H2,ln_CH4,ln_CO = y
+        return np.array( [np.array( [0,0,( np.e )**( ln_H2O ),( np.e )**( ln_CO2 \
+                ),0,( np.e )**( ln_H2 ),( np.e )**( ln_CH4 ),( np.e )**( ln_CO ),] \
+                ),np.array( [d_H2O * ( np.e )**( ln_x_H2O ),-1,0,a_CO2,0,0,0,0,] \
+                ),np.array( [-1,0,a_H2O,0,0,0,0,0,] ),np.array( [( np.e )**( ln_x_H2O ) \
+                * ( 1 + -1 * ( np.e )**( lnalphaG ) ) * P,0,( np.e )**( ( lnalphaG + \
+                ln_H2O ) ),0,( ( np.e )**( ( lnalphaG + ln_H2O ) ) + -1 * ( np.e )**( \
+                ( lnalphaG + ln_x_H2O ) ) * P ),0,0,0,] ),np.array( [0,( np.e )**( \
+                ln_x_CO2 ) * ( 1 + -1 * ( np.e )**( lnalphaG ) ) * P,0,( np.e )**( ( \
+                lnalphaG + ln_CO2 ) ),( ( np.e )**( ( lnalphaG + ln_CO2 ) ) + -1 * ( \
+                np.e )**( ( lnalphaG + ln_x_CO2 ) ) * P ),0,0,0,] ),np.array( \
+                [0,0,1,0,0,-1,0,0,] ),np.array( [0,0,0,1,0,0,0,-1,] ),np.array( \
+                [0,0,2,1,0,0,-1,0,] ),] )
 
     # simple system
     def equation(PCO2):
@@ -122,7 +154,7 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
     P_CH4 = C3*P_CO2*P_H2O**2
     x_H2O = np.exp(F2+a_H2O*np.log(P_H2O))
     # use different alphaG as inital guess
-    alphaG = .5
+    alphaG = .1
 
     # now use the solution of the simple system to solve the
     # harder problem. I will try to solve it two different ways to
@@ -133,7 +165,7 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
 
     try:
         init_cond = [np.log(x_H2O),np.log(x_CO2),np.log(P_H2O),np.log(P_CO2),alphaG,np.log(P_H2),np.log(P_CH4),np.log(P_CO)]
-        sol = optimize.root(system,init_cond,method='lm',options={'maxiter': 10000})
+        sol = optimize.root(system,init_cond,method='lm',options={'maxiter': 10000},jac=jacob)
         error = np.linalg.norm(system(sol['x']))
         if error>tol or sol['success']==False:
             sys.exit('Convergence issues!')
@@ -143,9 +175,9 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
         if alphaG<0:
             sys.exit('alphaG is negative')
     except:
-        alphaG = 0.1
+        alphaG = .1
         init_cond1 = [np.log(x_H2O),np.log(x_CO2),np.log(P_H2O),np.log(P_CO2),np.log(alphaG),np.log(P_H2),np.log(P_CH4),np.log(P_CO)]
-        sol1 = optimize.root(system1,init_cond1,method='lm',options={'maxiter': 10000})
+        sol1 = optimize.root(system1,init_cond1,method='lm',options={'maxiter': 10000},jac=jacob1)
         error1 = np.linalg.norm(system1(sol1['x']))
         ln_x_H2O,ln_x_CO2,ln_P_H2O,ln_P_CO2,ln_alphaG,ln_P_H2,ln_P_CH4,ln_P_CO = sol1['x']
         alphaG = np.exp(ln_alphaG)
