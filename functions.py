@@ -185,6 +185,8 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
             print(error1)
             print(sol1)
             sys.exit('Convergence issues!')
+        if error1>tol:
+            print('warning: outgassing equations not solved to high tolerance')
 
     return (np.exp(ln_P_H2O),np.exp(ln_P_H2),np.exp(ln_P_CO2),np.exp(ln_P_CO),\
            np.exp(ln_P_CH4),alphaG,np.exp(ln_x_CO2),np.exp(ln_x_H2O))
