@@ -5,7 +5,7 @@ Magma deep in the Earth has volatiles in it - molecules that are gases at standa
 
 ![diagram](images/diagram.jpg = 200x)
 
-<img src="images/diagram.jpg" width="400" class="center" />
+<p style="text-align:center;"><img src="images/diagram.jpg" width="400" class="center" />
 
 This Python program calculates the gases produced by volcanoes by accounting for gases exsolving from magma to form bubbles, and the chemical reactions in those bubbles.
 
