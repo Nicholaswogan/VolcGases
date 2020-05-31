@@ -3,14 +3,14 @@ This Python program calculates the gases produced by a volcano.
 
 Magma deep in the Earth has volatiles in it - molecules that are gases at standard temperature and pressure. As magma rises to near the surface of Earth, the overburden pressure drops. When the pressure is low enough, volatiles exsolve from the magma, and form gas bubbles (see diagram below). Chemical reactions in gas bubbles change the chemical make-up of the bubble. Eventually, the gas bubble is released from the magma to the atmosphere.
 
+The Python function```solve_gases``` in ```VolcGases/functions.py``` calculates the gases produced by volcanoes by accounting for gases exsolving from magma to form bubbles, and the chemical reactions in those bubbles.
+
 <p align="center">
-  <img src="images/diagram.jpg" alt="Diagram" width="400"/>
+  <img src="images/diagram.jpg" alt="Diagram" width="500"/>
 </p>
 
-This Python program calculates the gases produced by volcanoes by accounting for gases exsolving from magma to form bubbles, and the chemical reactions in those bubbles.
-
 ## Installation
-First, download or clone this repository and then navigate to the repository with a bash terminal. Finally, you can install GibbsPy with with pip command
+First, download or clone this repository and then navigate to the repository with a bash terminal. Finally, you can install VolcGases with with pip command
 ```bash
 pip install .
 ```
@@ -47,3 +47,5 @@ P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = solve_gases(T,P,f_O2,mCO2tot,mH
 # x_CO2 = mol fraction of CO2 in magma after degassing
 # x_H2O = mol fraction of H2O in magma after degassing
 ```
+
+## Examples
