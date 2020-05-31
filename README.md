@@ -34,7 +34,7 @@ P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = solve_gases(T,P,f_O2,mCO2tot,mH
 
 | Input/Output |               Variable               |                 Units                  | Definition                                            |
 | :- | :----------------------------------: | :------------------------------------: | :---------------------------------------------------- |
-| Input |                \(P\)                 |                  bar                   | Total pressure of degassing                           |
+| Input |                $P$                 |                  bar                   | Total pressure of degassing                           |
 | Input |                \(T\)                 |                   K                    | Temperature of magma and gas of degassing             |
 | Input |         \(f_{\mathrm{O_2}}\)         |                  bar                   | Oxygen fugacity of the magma                          |
 | Input | \(m_{\mathrm{CO_2}}^{\mathrm{tot}}\) | (g CO\(_2\))(g gas and magma)\(^{-1}\) | mass fraction CO\(_2\) in magma before degassing      |
