@@ -31,8 +31,16 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
     '''
 
     ###### Solubility constants
-    F1 = -14.234368891317805
-    F2 = -5.925014547418225
+    A1 = -0.4200250000201988
+    A2 = -2.59560737813789
+    M_H2O = 18.01528
+    M_CO2 = 44.01
+    C_CO2 = 0.14
+    C_H2O = 0.02
+    # mol of magma/g of magma
+    x = 0.01550152865954013
+    F1 = np.log(1/(M_H2O*x*10**6))+C_CO2*P/T+A1
+    F2 = np.log(1/(M_H2O*x*100))+C_H2O*P/T+A2
     a_H2O = 0.54
     a_CO2 = 1
     d_H2O = 2.3
