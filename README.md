@@ -30,20 +30,12 @@ f_O2 = 10**(log_FMQ) # units - bar
 
 ### OUTPUT ###
 P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = solve_gases(T,P,f_O2,mCO2tot,mH2Otot)
+# P_H2O = Partial pressure of H2O in gas (bar)
+# P_H2 = Partial pressure of H2 in gas (bar)
+# P_CO2 = Partial pressure of CO2 in gas (bar)
+# P_CO = Partial pressure of CO in gas (bar)
+# P_CH4 = Partial pressure of CH4 in gas (bar)
+# alphaG = (mol gas)/(mol gas and magma)
+# x_CO2 = mol fraction of CO2 in magma after degassing
+# x_H2O = mol fraction of H2O in magma after degassing
 ```
-
-| Input/Output |               Variable               |                 Units                  | Definition                                            |
-| :- | :----------------------------------: | :------------------------------------: | :---------------------------------------------------- |
-| Input |                $P$                 |                  bar                   | Total pressure of degassing                           |
-| Input |                \(T\)                 |                   K                    | Temperature of magma and gas of degassing             |
-| Input |         \(f_{\mathrm{O_2}}\)         |                  bar                   | Oxygen fugacity of the magma                          |
-| Input | \(m_{\mathrm{CO_2}}^{\mathrm{tot}}\) | (g CO\(_2\))(g gas and magma)\(^{-1}\) | mass fraction CO\(_2\) in magma before degassing      |
-| Input | \(m_{\mathrm{H_2O}}^{\mathrm{tot}}\) | (g CO\(_2\))(g gas and magma)\(^{-1}\) | mass fraction H\(_2\)O in magma before degassing      |
-| Output |        \(x_{\mathrm{H_2O}}\)         |  (mol H\(_2\)O) (mol magma)\(^{-1}\)   | mol fraction of H\(_2\)O in the magma after degassing |
-| Output |        \(x_{\mathrm{CO_2}}\)         |  (mol CO\(_2\)) (mol magma)\(^{-1}\)   | mol fraction of CO\(_2\) in the magma after degassing |
-| Output |        \(P_{\mathrm{H_2O}}\)         |                  bar                   | Partial pressure of H\(_2\)O                          |
-| Output |        \(P_{\mathrm{CO_2}}\)         |                  bar                   | Partial pressure of CO\(_2\)                          |
-| Output |         \(P_{\mathrm{H_2}}\)         |                  bar                   | Partial pressure of H\(_2\)                           |
-| Output |         \(P_{\mathrm{CO}}\)          |                  bar                   | Partial pressure of CO                                |
-| Output |        \(P_{\mathrm{CH_4}}\)         |                  bar                   | Partial pressure of CH\(_4\)                          |
-| Output |      \(\alpha_{\mathrm{gas}}\)       | (mol gas)(mol gas and magma)\(^{-1}\)  | mol fraction in gas phase                             |
