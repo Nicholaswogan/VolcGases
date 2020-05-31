@@ -48,4 +48,6 @@ P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = solve_gases(T,P,f_O2,mCO2tot,mH
 # x_H2O = mol fraction of H2O in magma after degassing
 ```
 
-## Examples
+## Other
+
+The directory `examples` contains an example calculation. Also, the directory `article_calculations` calculations for a science article I am writing using this function.
