@@ -45,9 +45,6 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
     a_CO2 = 1
     d_H2O = 2.3
 
-    # mol of magma/g of magma
-    x = 0.01550152865954013
-
     # molar mass in g/mol
     M_H2O = 18.01528
     M_CO2 = 44.01
