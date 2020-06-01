@@ -39,7 +39,7 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
     C_H2O = 0.02
     # mol of magma/g of magma
     x = 0.01550152865954013
-    F1 = np.log(1/(M_H2O*x*10**6))+C_CO2*P/T+A1
+    F1 = np.log(1/(M_CO2*x*10**6))+C_CO2*P/T+A1
     F2 = np.log(1/(M_H2O*x*100))+C_H2O*P/T+A2
     a_H2O = 0.54
     a_CO2 = 1
