@@ -45,10 +45,6 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
     a_CO2 = 1
     d_H2O = 2.3
 
-    # molar mass in g/mol
-    M_H2O = 18.01528
-    M_CO2 = 44.01
-
     # calculate mol fraction of CO2 and H2O in the magma
     xCO2tot=(mCO2tot/M_CO2)/x
     xH2Otot=(mH2Otot/M_H2O)/x
@@ -191,7 +187,10 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
             print(sol1)
             sys.exit('Convergence issues!')
         if error1>tol:
-            print('warning: outgassing equations not solved to high tolerance')
+            # assume no outgassing happens here
+            return (0,0,0,0,\
+                    0,0,xCO2tot,xH2Otot)
+            # print('warning: outgassing equations not solved to high tolerance')
 
     return (np.exp(ln_P_H2O),np.exp(ln_P_H2),np.exp(ln_P_CO2),np.exp(ln_P_CO),\
            np.exp(ln_P_CH4),alphaG,np.exp(ln_x_CO2),np.exp(ln_x_H2O))
