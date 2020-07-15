@@ -196,6 +196,19 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
            np.exp(ln_P_CH4),alphaG,np.exp(ln_x_CO2),np.exp(ln_x_H2O))
 
 def degassing_pressure(T,DFMQ,mCO2tot,mH2Otot,P_range = [1e-4,30000]):
+    """
+    This function determines the overburden pressure where degassing begins.
+
+    Inputs:
+    T = temperature of the magma and gas in kelvin
+    f_O2 = oxygen fugacity of the melt
+    mCO2tot = mass fraction of CO2 in the magma
+    mH2Otot = mass fraction of H2O in the magma
+    P_range = the degassing pressure must fall within this range
+
+    Outputs:
+    P = Pressure where degassing begins
+    """
     A = 25738
     B = 9
     C = 0.092
