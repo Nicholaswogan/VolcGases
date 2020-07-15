@@ -201,7 +201,7 @@ def degassing_pressure(T,DFMQ,mCO2tot,mH2Otot,P_range = [1e-4,30000]):
 
     Inputs:
     T = temperature of the magma and gas in kelvin
-    f_O2 = oxygen fugacity of the melt
+    DFMQ = oxygen fugacity of the melt relative to the FMQ buffer (e.g. FMQ+1 -> 1)
     mCO2tot = mass fraction of CO2 in the magma
     mH2Otot = mass fraction of H2O in the magma
     P_range = the degassing pressure must fall within this range
