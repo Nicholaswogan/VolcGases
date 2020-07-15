@@ -194,3 +194,27 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
 
     return (np.exp(ln_P_H2O),np.exp(ln_P_H2),np.exp(ln_P_CO2),np.exp(ln_P_CO),\
            np.exp(ln_P_CH4),alphaG,np.exp(ln_x_CO2),np.exp(ln_x_H2O))
+
+def degassing_pressure(T,DFMQ,mCO2tot,mH2Otot,P_range = [1e-4,30000]):
+    A = 25738
+    B = 9
+    C = 0.092
+    def func(P):
+        log_FMQ = (-A/T+B+C*(P-1)/T)
+        f_O2 = 10**(log_FMQ+DFMQ) # units - bar
+        P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = solve_gases(T,P,f_O2,mCO2tot,mH2Otot)
+        return alphaG
+    P = find_first_zero(func, P_range[0], P_range[1])
+    return P
+
+def find_first_zero(func, min, max, tol=1e-5):
+    min, max = float(min), float(max)
+    assert (max + tol) > max
+    while (max - min) > tol:
+        mid = (min + max) / 2
+        sol = func(mid)
+        if sol == 0 or sol != sol:
+            max = mid
+        else:
+            min = mid
+    return max
