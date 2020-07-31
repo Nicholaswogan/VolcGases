@@ -18,7 +18,7 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
 
     Outputs:
     an array which contains
-    [PH2O, PH2, PCO2, PCO, PCH2, alphaG, xCO2, xH2O]
+    [PH2O, PH2, PCO2, PCO, PCH4, alphaG, xCO2, xH2O]
     where
     PH2O = partial pressure of H2O in the gas in bar
     PH2 = partial pressure of H2 in the gas in bar
@@ -231,3 +231,66 @@ def find_first_zero(func, min, max, tol=1e-5):
         else:
             min = mid
     return max
+
+def gas_production(T,P,f_O2,mCO2tot,mH2Otot):
+    """
+    This function calculates gas production (mol gas produce/kg of magma)
+    of degassing volcano.
+
+    Inputs:
+    T = temperature of the magma and gas in kelvin
+    P = pressure of the gas in bar
+    f_O2 = oxygen fugacity of the melt (bar)
+    mCO2tot = mass fraction of CO2 in the magma
+    mH2Otot = mass fraction of H2O in the magma
+
+    Outputs:
+    an array which contains
+    [H2O, H2, CO2, CO, CH4]
+    where
+    H2O = H2O production (mol H2O produce/kg of magma)
+    H2 = H2 production (mol H2 produce/kg of magma)
+    CO2 = CO2 production (mol CO2 produce/kg of magma)
+    CO = CO production (mol CO produce/kg of magma)
+    CH4 = CH4 production (mol CH4 produce/kg of magma)
+    """
+    x = 0.01550152865954013 # mol of magma/ g of magma
+    P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = solve_gases(T,P,f_O2,mCO2tot,mH2Otot)
+    H2O = 1000*alphaG*x*P_H2O/P
+    H2 = 1000*alphaG*x*P_H2/P
+    CO2 = 1000*alphaG*x*P_CO2/P
+    CO = 1000*alphaG*x*P_CO/P
+    CH4 = 1000*alphaG*x*P_CH4/P
+    return np.array([H2O,H2,CO2,CO,CH4])
+
+def outgassing_flux(T,P,f_O2,mCO2tot,mH2Otot,Q):
+    """
+    This function calculates gas production (mol gas produce/kg of magma)
+    of degassing volcano.
+
+    Inputs:
+    T = temperature of the magma and gas in kelvin
+    P = pressure of the gas in bar
+    f_O2 = oxygen fugacity of the melt (bar)
+    mCO2tot = mass fraction of CO2 in the magma
+    mH2Otot = mass fraction of H2O in the magma
+    Q = magma production rate (kg magma/yr)
+
+    Outputs:
+    an array which contains
+    [FH2O, FH2, FCO2, FCO, FCH4]
+    where
+    FH2O = volcanic H2O flux (mol H2O/yr)
+    FH2 = volcanic H2 flux (mol H2/yr)
+    FCO2 = Cvolcanic O2 flux (mol CO2/yr)
+    FCO = volcanic CO flux (mol CO/yr)
+    FCH4 = volcanic CH4 flux (mol CH4/yr)
+    """
+
+    H2O,H2,CO2,CO,CH4 = gas_production(T,P,f_O2,mCO2tot,mH2Otot)
+    FH2O = H2O*Q
+    FH2 = H2*Q
+    FCO2 = CO2*Q
+    FCO = CO*Q
+    FCH4 = CH4*Q
+    return np.array([FH2O,FH2,FCO2,FCO,FCH4])
