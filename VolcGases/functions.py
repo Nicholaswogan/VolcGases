@@ -294,3 +294,80 @@ def outgassing_flux(T,P,f_O2,mCO2tot,mH2Otot,Q):
     FCO = CO*Q
     FCH4 = CH4*Q
     return np.array([FH2O,FH2,FCO2,FCO,FCH4])
+
+def closed_system_cooling(T,P,f_O2,mCO2tot,mH2Otot,DT):
+    """
+    This function calculates the chemistry of volcanic gas after
+    closed system cooling. It first calculates gas chemistry when in equilibrium
+    with the magma. Then it calculates the equlibrium chemistry of that gas if it cooled by
+    temperature DT.
+
+    Inputs:
+    T = temperature of the magma and gas in kelvin
+    P = pressure of the gas in bar
+    f_O2 = oxygen fugacity of the melt (bar)
+    mCO2tot = mass fraction of CO2 in the magma
+    mH2Otot = mass fraction of H2O in the magma
+    DT = temperature drop of gas in kelvin. positive number = drop
+
+    Outputs:
+    an array which contains
+    [N_H2O, N_H2, N_CO2, N_CO, N_CH4, N_O2]
+    where
+    N_H2O = H2O production (mol H2O produce/kg of magma)
+    N_H2 = H2 production (mol H2 produce/kg of magma)
+    N_CO2 = CO2 production (mol CO2 produce/kg of magma)
+    N_CO = CO production (mol CO produce/kg of magma)
+    N_CH4 = CH4 production (mol CH4 produce/kg of magma)
+    N_O2 = O2 production (mol O2 produce/kg of magma)
+    """
+
+    T1 = T-DT
+    x = 0.01550152865954013
+
+    # calculate gas composition when in equilibrium with the magma
+    P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = solve_gases(T,P,f_O2,mCO2tot,mH2Otot)
+    P_i = np.array([P_H2O,P_H2,P_CO2,P_CO,P_CH4,f_O2])
+    LH2O,LH2,LCO2,LCO,LCH4,LO2 = 0,1,2,3,4,5
+
+    # now calculate moles of each gas per kg of magma (N is moles/kg of magma!)
+    N_i = 1000*alphaG*x*P_i/P
+
+    # calculate total moles of each atom
+    NH_tot = 2*N_i[LH2]+2*N_i[LH2O]+4*N_i[LCH4]
+    NC_tot = N_i[LCO2]+N_i[LCO]+N_i[LCH4]
+    NO_tot = N_i[LH2O]+2*N_i[LCO2]+N_i[LCO]+2*N_i[LO2]
+
+    # everying in terms of logs
+    def closed_system(y):
+        lnN_H2O,lnN_H2,lnN_CO2,lnN_CO,lnN_CH4,lnN_O2,lnN_tot = y
+        return (lnN_H2+0.5*lnN_O2+.5*np.log(P)-(np.log(K1)+lnN_H2O+0.5*lnN_tot),\
+                lnN_CO+0.5*lnN_O2+.5*np.log(P)-(np.log(K2)+lnN_CO2+0.5*lnN_tot),\
+                lnN_CH4+2*lnN_O2-(np.log(K3)+lnN_CO2+2*lnN_H2O),\
+                NH_tot-(2*np.exp(lnN_H2O)+2*np.exp(lnN_H2)+4*np.exp(lnN_CH4)),\
+                NO_tot-(np.exp(lnN_H2O)+np.exp(lnN_CO)+2*np.exp(lnN_CO2)+2*np.exp(lnN_O2)),\
+                NC_tot-(np.exp(lnN_CO2)+np.exp(lnN_CO)+np.exp(lnN_CH4)),\
+                np.exp(lnN_tot)-(np.exp(lnN_H2O)+np.exp(lnN_H2)+np.exp(lnN_CO2)+np.exp(lnN_CO)+np.exp(lnN_CH4)+np.exp(lnN_O2)))
+
+
+    # intital condition is equilibrium state of gases in magma
+    init_cond = np.log(np.array([N_i[LH2O],N_i[LH2],N_i[LCO2],N_i[LCO],N_i[LCH4],N_i[LO2],np.sum(N_i)]))
+
+    # equilibrium constants at new temperature T1
+    K1 = np.exp(-29755.11319228574/T1+6.652127716162998)
+    K2 = np.exp(-33979.12369002451/T1+10.418882755464773)
+    K3 = np.exp(-96444.47151911151/T1+0.22260815074146403)
+
+    sol = optimize.root(closed_system,init_cond,method='lm',options={'maxiter': 10000})
+    # check for error
+    error = np.linalg.norm(closed_system(sol['x']))
+    tol = 1e-7
+    if sol['success']== False or error>tol:
+        sys.exit()
+
+    # solution. Should be moles of gas/kg of magma
+    N_sol = np.exp(sol['x'])[:-1]
+    N_tot = np.exp(sol['x'])[-1]
+    N_H2O, N_H2, N_CO2, N_CO, N_CH4, N_O2 = N_sol
+
+    return np.array([N_H2O, N_H2, N_CO2, N_CO, N_CH4, N_O2])
