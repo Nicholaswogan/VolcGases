@@ -360,7 +360,7 @@ def closed_system_cooling(T,P,f_O2,mCO2tot,mH2Otot,DT):
     K2 = np.exp(-33979.12369002451/T1+10.418882755464773)
     K3 = np.exp(-96444.47151911151/T1+0.22260815074146403)
 
-    sol = optimize.root(closed_system,init_cond,method='lm',options={'maxiter': 10000})
+    sol = optimize.root(closed_system,init_cond,method='lm',options={'maxiter': 500000})
     # check for error
     error = np.linalg.norm(closed_system(sol['x']))
     tol = 1e-7
