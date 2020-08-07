@@ -365,7 +365,7 @@ def closed_system_cooling(T,P,f_O2,mCO2tot,mH2Otot,DT):
     error = np.linalg.norm(closed_system(sol['x']))
     tol = 1e-7
     if sol['success']== False or error>tol:
-        sys.exit()
+        sys.exit('root finding for closed system failed')
 
     # solution. Should be moles of gas/kg of magma
     N_sol = np.exp(sol['x'])[:-1]
