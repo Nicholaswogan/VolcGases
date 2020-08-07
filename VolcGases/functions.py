@@ -327,6 +327,8 @@ def closed_system_cooling(T,P,f_O2,mCO2tot,mH2Otot,DT):
 
     # calculate gas composition when in equilibrium with the magma
     P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = solve_gases(T,P,f_O2,mCO2tot,mH2Otot)
+    if alphaG==0:
+        return np.array([0,0,0,0,0,0])
     P_i = np.array([P_H2O,P_H2,P_CO2,P_CO,P_CH4,f_O2])
     LH2O,LH2,LCO2,LCO,LCH4,LO2 = 0,1,2,3,4,5
 
