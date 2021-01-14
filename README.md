@@ -10,9 +10,9 @@ The Python function```solve_gases``` in ```VolcGases/functions.py``` calculates 
 </p>
 
 ## Installation
-First, download or clone this repository and then navigate to the repository with a bash terminal. Finally, you can install VolcGases with with pip command
+First, download or clone this repository and then navigate to the repository with a bash terminal. Finally, you can install VolcGases with with pip command. For this to work you must have `python` with the `numpy` package, and the GNU fortran compiler in your path (`gfortran`).
 ```bash
-pip install .
+python -m pip install .
 ```
 
 ## Usage
