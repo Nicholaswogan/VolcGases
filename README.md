@@ -1,5 +1,5 @@
 # VolcGases
-This Python program calculates the gases produced by a volcano.
+This is a `Python` wrapper to a `Fortran` program that calculates the gases produced by a volcano.
 
 Magma deep in the Earth has volatiles in it - molecules that are gases at standard temperature and pressure. As magma rises to near the surface of Earth, the overburden pressure drops. When the pressure is low enough, volatiles exsolve from the magma, and form gas bubbles (see diagram below). Chemical reactions in gas bubbles change the chemical make-up of the bubble. Eventually, the gas bubble is released from the magma to the atmosphere.
 
