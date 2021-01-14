@@ -123,12 +123,12 @@ module volc
       P_CO = C2*P_CO2
       x_CO2 = dexp(F1+a_CO2*dlog(P_CO2))
       alphaG = P*(x_CO2-xCO2tot)/(-P_CO2+P*x_CO2)
-      P_H2O = (P-P_CO2-C2*P_CO2)/(1+C1+C3*P_CO2)
+      P_H2O = (P-P_CO2-C2*P_CO2)/(1.d0+C1+C3*P_CO2)
       P_H2 = C1*P_H2O
-      P_CH4 = C3*P_CO2*P_H2O**2
+      P_CH4 = C3*P_CO2*P_H2O**2.d0
       x_H2O = dexp(F2+a_H2O*dlog(P_H2O))
       ! use different alphaG as inital guess
-      alphaG = .1
+      alphaG = 0.1d0
 
       init_cond = (/dlog(x_H2O),dlog(x_CO2),dlog(P_H2O),dlog(P_CO2) &
                     ,alphaG,dlog(P_H2),dlog(P_CH4),dlog(P_CO)/)
@@ -349,13 +349,13 @@ module volc
       if (n == 0) return
 
       if (n == 1) then
-          array(1) = from
-          return
+        array(1) = from
+        return
       end if
 
 
       do i=1, n
-          array(i) = from + range * (i - 1) / (n - 1)
+        array(i) = from + range * (i - 1) / (n - 1)
       end do
     end subroutine
 
