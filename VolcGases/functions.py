@@ -1,8 +1,18 @@
 import numpy as np
 from scipy import optimize
 import sys
-from VolcGasesFort import volc
+import ctypes as ct
+from numba import njit
+import os
 
+rootdir = os.path.dirname(os.path.realpath(__file__))+'/'
+mylib = ct.CDLL(rootdir+'VolcGasesFort.so')
+solve_gases_wrap = mylib.solve_gases_wrap
+solve_gases_wrap.argtypes = [ct.c_void_p, ct.c_void_p, ct.c_void_p, ct.c_void_p, ct.c_void_p, \
+                             ct.c_void_p, ct.c_void_p, ct.c_void_p, \
+                             ct.c_void_p, ct.c_void_p, ct.c_void_p, \
+                             ct.c_void_p, ct.c_void_p]
+solve_gases_wrap.restype = None
 
 def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
     '''
@@ -30,8 +40,58 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
     xCO2 = mol fraction of the CO2 in the magma
     xH2O = mol fraction of the H2O in the magma
     '''
+    T_,P_,f_O2_,mCO2tot_,mH2Otot_ = \
+    np.array(T,np.float64),np.array(P,np.float64), np.array(f_O2,np.float64), np.array(mCO2tot,np.float64), np.array(mH2Otot,np.float64)
+    
+    P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = \
+    np.array(0.0), np.array(0.0), np.array(0.0), np.array(0.0), \
+    np.array(0.0), np.array(0.0), np.array(0.0), np.array(0.0)
+    
+    solve_gases_wrap(T_.ctypes.data, P_.ctypes.data ,f_O2_.ctypes.data ,mCO2tot_.ctypes.data, mH2Otot_.ctypes.data, \
+                 P_H2O.ctypes.data, P_H2.ctypes.data ,P_CO2.ctypes.data, \
+                 P_CO.ctypes.data, P_CH4.ctypes.data, alphaG.ctypes.data, \
+                 x_CO2.ctypes.data, x_H2O.ctypes.data)
+    return P_H2O.item(),P_H2.item(),P_CO2.item(),P_CO.item(),P_CH4.item(),alphaG.item(),x_CO2.item(),x_H2O.item()
+    
+@njit
+def solve_gases_jit(T,P,f_O2,mCO2tot,mH2Otot):
+    '''
+    This function solves for the speciation of gases produced by
+    a volcano. This code assumes magma composition of the lava erupting at
+    Mt. Etna Italy.
 
-    return volc.solve_gases(T,P,f_O2,mCO2tot,mH2Otot)
+    Inputs:
+    T = temperature of the magma and gas in kelvin
+    P = pressure of the gas in bar
+    f_O2 = oxygen fugacity of the melt
+    mCO2tot = mass fraction of CO2 in the magma
+    mH2Otot = mass fraction of H2O in the magma
+
+    Outputs:
+    an array which contains
+    [PH2O, PH2, PCO2, PCO, PCH4, alphaG, xCO2, xH2O]
+    where
+    PH2O = partial pressure of H2O in the gas in bar
+    PH2 = partial pressure of H2 in the gas in bar
+    PCO2 = partial pressure of CO2 in the gas in bar
+    PCO = partial pressure of CO in the gas in bar
+    PCH4 = partial pressure of CH4 in the gas in bar
+    alphaG = moles of gas divide by total moles in gas and magma combined
+    xCO2 = mol fraction of the CO2 in the magma
+    xH2O = mol fraction of the H2O in the magma
+    '''
+    T_,P_,f_O2_,mCO2tot_,mH2Otot_ = \
+    np.array(T,np.float64),np.array(P,np.float64), np.array(f_O2,np.float64), np.array(mCO2tot,np.float64), np.array(mH2Otot,np.float64)
+    
+    P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = \
+    np.array(0.0), np.array(0.0), np.array(0.0), np.array(0.0), \
+    np.array(0.0), np.array(0.0), np.array(0.0), np.array(0.0)
+    
+    solve_gases_wrap(T_.ctypes.data, P_.ctypes.data ,f_O2_.ctypes.data ,mCO2tot_.ctypes.data, mH2Otot_.ctypes.data, \
+                 P_H2O.ctypes.data, P_H2.ctypes.data ,P_CO2.ctypes.data, \
+                 P_CO.ctypes.data, P_CH4.ctypes.data, alphaG.ctypes.data, \
+                 x_CO2.ctypes.data, x_H2O.ctypes.data)
+    return P_H2O.item(),P_H2.item(),P_CO2.item(),P_CO.item(),P_CH4.item(),alphaG.item(),x_CO2.item(),x_H2O.item()
 
 def degassing_pressure(T,DFMQ,mCO2tot,mH2Otot,P_range = [1e-4,30000]):
     """

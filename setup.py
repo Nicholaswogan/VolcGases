@@ -1,5 +1,8 @@
 
-from numpy.distutils.core import setup, Extension
+from setuptools import setup
+from numpy.distutils.command.build_ext import build_ext
+
+from subprocess import call
 
 sources = ['src/VolcGasesFort.f90',
            'src/minpack/dpmpar.f',
@@ -10,17 +13,13 @@ sources = ['src/VolcGasesFort.f90',
            'src/minpack/lmdif.f',
            'src/minpack/lmpar.f',
            'src/minpack/qrfac.f',
-           'src/minpack/qrsolv.f']
-
-extensions = [
-Extension(name="VolcGasesFort",
-          sources=sources,
-          extra_f90_compile_args = ['-O3', '-freal-4-real-8'],
-          extra_f77_compile_args = ['-O3', '-freal-4-real-8'],
-          f2py_options=['only: solve_gases'])
-          ]
+           'src/minpack/qrsolv.f',
+           'src/VolcGasesFort_wrapper.f90']
+    
+cmd = ['gfortran']+sources+'-shared -fPIC -o VolcGases/VolcGasesFort.so -O3'.split()
+call(cmd)
 
 setup(name = 'VolcGases',
       packages=['VolcGases'],
-      version='2.0',
-      ext_modules=extensions)
+      version='2.2',
+      include_package_data=True)
