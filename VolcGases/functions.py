@@ -2,7 +2,7 @@ import numpy as np
 from scipy import optimize
 import sys
 import ctypes as ct
-from numba import njit
+import numba as nb
 import os
 
 rootdir = os.path.dirname(os.path.realpath(__file__))+'/'
@@ -53,7 +53,7 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
                  x_CO2.ctypes.data, x_H2O.ctypes.data)
     return P_H2O.item(),P_H2.item(),P_CO2.item(),P_CO.item(),P_CH4.item(),alphaG.item(),x_CO2.item(),x_H2O.item()
     
-@njit
+@nb.njit(nb.types.UniTuple(nb.float64,8)(nb.float64,nb.float64,nb.float64,nb.float64,nb.float64))
 def solve_gases_jit(T,P,f_O2,mCO2tot,mH2Otot):
     '''
     This function solves for the speciation of gases produced by

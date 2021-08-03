@@ -10,7 +10,7 @@ The Python function```solve_gases``` in ```VolcGases/functions.py``` calculates 
 </p>
 
 ## Installation
-First, download or clone this repository and then navigate to the repository with a bash terminal. Finally, you can install VolcGases with with pip command. For this to work you must have `python` with the `numpy` package, and the GNU fortran compiler in your path (`gfortran`).
+First, download or clone this repository and then navigate to the repository with a bash terminal. Finally, you can install VolcGases with with pip command. For this to work you must have `python`, and a fortran compiler. On Mac you can install a fortran compiler with the terminal command `brew install gcc`.
 ```bash
 python -m pip install .
 ```
@@ -48,6 +48,9 @@ P_H2O,P_H2,P_CO2,P_CO,P_CH4,alphaG,x_CO2,x_H2O = solve_gases(T,P,f_O2,mCO2tot,mH
 # x_H2O = mol fraction of H2O in magma after degassing
 ```
 
+Also, there is a version of `solve_gases` which is jit-ed with numba: `VolcGases.functions.solve_gases_jit`. You can use this version of solve_gases from within other numba functions.
+
+
 ## Other
 
-The directory `examples` contains an example calculation. Also, the directory `article_calculations` contains calculations for a science article I am writing using this code.
+The directory `examples` contains an example calculation. Also, the directory `article_calculations` contains calculations for a science article I wrote: https://iopscience.iop.org/article/10.3847/PSJ/abb99e/meta
