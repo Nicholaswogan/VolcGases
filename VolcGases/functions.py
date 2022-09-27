@@ -103,6 +103,7 @@ def find_first_zero(func, min, max, tol=1e-5):
             min = mid
     return max
 
+@nb.njit()
 def gas_production(T,P,f_O2,mCO2tot,mH2Otot):
     """
     This function calculates gas production (mol gas produce/kg of magma)
@@ -134,6 +135,7 @@ def gas_production(T,P,f_O2,mCO2tot,mH2Otot):
     CH4 = 1000*alphaG*x*P_CH4/P
     return np.array([H2O,H2,CO2,CO,CH4])
 
+@nb.njit()
 def outgassing_flux(T,P,f_O2,mCO2tot,mH2Otot,Q):
     """
     This function calculates gas production (mol gas produce/kg of magma)
