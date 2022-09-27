@@ -17,6 +17,9 @@ target_link_libraries(volcgases minpack)
 
 # some extra optimizations
 if ("${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU")
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(volcgases PRIVATE -fcheck=all)
+  endif()
   if ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
     target_compile_options(minpack PRIVATE -funroll-loops -finline-functions)
     target_compile_options(volcgases PRIVATE -funroll-loops -finline-functions)

@@ -19,29 +19,20 @@ contains
     real(dp) :: x_H2O
     integer :: ierr
 
-    real(dp) :: tn(10)
-    integer, parameter :: nt = 100000
-    integer :: i
-
     T = 1473.0_dp
     P = 1.0_dp
     f_O2 = oxygen_fugacity(0.0_dp, T, P)
     mCO2tot = 1000e-6_dp
     mH2Otot = 1000e-6_dp
     
-    call cpu_time(tn(1))
-    do i = 1,nt
-      call solve_gases(T, P, f_O2, mCO2tot, mH2Otot, &
-                       P_H2O, P_H2, P_CO2, P_CO, P_CH4, alphaG, x_CO2, x_H2O, &
-                       ierr)
-      if (ierr /= 0) then
-        print*,ierr
-        stop 1
-      endif
-    enddo
-    call cpu_time(tn(2))
-
-    print"(a15,es10.2,a)","time = ",(tn(2) - tn(1))/real(nt,dp),' seconds'
+    call solve_gases(T, P, f_O2, mCO2tot, mH2Otot, &
+                      P_H2O, P_H2, P_CO2, P_CO, P_CH4, alphaG, x_CO2, x_H2O, &
+                      ierr)
+    if (ierr /= 0) then
+      print*,ierr
+      stop 1
+    endif
+    
     print"(a15,es10.2)","H2O = ",P_H2O/P
     print"(a15,es10.2)","H2 = ",P_H2/P
     print"(a15,es10.2)","CO2 = ",P_CO2/P
