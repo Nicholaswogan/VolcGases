@@ -3,8 +3,10 @@ module volcgases
   implicit none
   private
 
-  public :: solve_gases, dp
-  public :: solve_gases_c
+  public :: dp
+  public :: solve_gases, solve_gases_c
+  public :: gas_production
+  public :: outgassing_flux
 
   type :: SolveGasesData
     real(dp), pointer :: P
@@ -34,10 +36,10 @@ module volcgases
     integer :: ldfjac
     integer, allocatable :: ipvt(:) ! (n) out
     real(dp), allocatable :: qtf(:) ! (n) out
-    real(dp), allocatable :: wa1(:) ! (n) ! inout
-    real(dp), allocatable :: wa2(:) ! (n) ! inout
-    real(dp), allocatable :: wa3(:) ! (n) ! inout
-    real(dp), allocatable :: wa4(:) ! (m) ! inout
+    real(dp), allocatable :: wa1(:) ! (n) inout
+    real(dp), allocatable :: wa2(:) ! (n) inout
+    real(dp), allocatable :: wa3(:) ! (n) inout
+    real(dp), allocatable :: wa4(:) ! (m) inout
   end type
   interface LMData
     procedure :: LMData_create
@@ -45,6 +47,75 @@ module volcgases
 
 contains
 
+  !> Computes the outgassing flux (mol gas/yr)
+  subroutine outgassing_flux(T, P, f_O2, mCO2tot, mH2Otot, Q, &
+                             F_H2O, F_H2, F_CO2, F_CO, F_CH4, ierr)
+    real(dp), intent(in) :: T !! Temperature of degassing (K)
+    real(dp), target, intent(in) :: P !! Pressure of degassing in (bars)
+    real(dp), intent(in) :: f_O2 !! Oxygen fugacity (bar)
+    real(dp), intent(in) :: mCO2tot !! Mass fraction of CO2 in melt
+    real(dp), intent(in) :: mH2Otot !! Mass fraction of H2O in melt
+    real(dp), intent(in) :: Q !! magma production rate (kg magma/yr)
+    real(dp), intent(out) :: F_H2O !! Volcanic H2O flux (mol/yr)
+    real(dp), intent(out) :: F_H2 !! Volcanic H2 flux (mol/yr)
+    real(dp), intent(out) :: F_CO2 !! Volcanic CO2 flux (mol/yr)
+    real(dp), intent(out) :: F_CO !! Volcanic CO flux (mol/yr)
+    real(dp), intent(out) :: F_CH4 !! Volcanic CH4 flux (mol/yr)
+    integer, intent(out) :: ierr !! Indicates error.
+                                 !!
+                                 !! * ierr == 0, means success
+                                 !! * ierr == -1, means improper inputs (unphysical negative value)
+                                 !! * ierr == -2, means the first, simple, root solve failed
+    
+    real(dp) :: q_H2O, q_H2, q_CO2, q_CO, q_CH4
+
+    call gas_production(T, P, f_O2, mCO2tot, mH2Otot, &
+                        q_H2O, q_H2, q_CO2, q_CO, q_CH4, ierr)
+    F_H2O = q_H2O*Q
+    F_H2 = q_H2*Q
+    F_CO2 = q_CO2*Q
+    F_CO = q_CO*Q
+    F_CH4 = q_CH4*Q
+  end subroutine
+
+  !> calculates gas production (mol gas produced/kg of magma)
+  !> of a degassing volcano.
+  subroutine gas_production(T, P, f_O2, mCO2tot, mH2Otot, &
+                            q_H2O, q_H2, q_CO2, q_CO, q_CH4, ierr)
+    use volcgases_const, only: x
+    real(dp), intent(in) :: T !! Temperature of degassing (K)
+    real(dp), target, intent(in) :: P !! Pressure of degassing in (bars)
+    real(dp), intent(in) :: f_O2 !! Oxygen fugacity (bar)
+    real(dp), intent(in) :: mCO2tot !! Mass fraction of CO2 in melt
+    real(dp), intent(in) :: mH2Otot !! Mass fraction of H2O in melt
+    real(dp), intent(out) :: q_H2O !! production rate of H2O (mol gas / kg magma)
+    real(dp), intent(out) :: q_H2 !! production rate of H2 (mol gas / kg magma)
+    real(dp), intent(out) :: q_CO2 !! production rate of CO2 (mol gas / kg magma)
+    real(dp), intent(out) :: q_CO !! production rate of CO (mol gas / kg magma)
+    real(dp), intent(out) :: q_CH4 !! production rate of CH4 (mol gas / kg magma)
+    integer, intent(out) :: ierr !! Indicates error.
+                                 !!
+                                 !! * ierr == 0, means success
+                                 !! * ierr == -1, means improper inputs (unphysical negative value)
+                                 !! * ierr == -2, means the first, simple, root solve failed
+
+    real(dp) :: P_H2O, P_H2, P_CO2, P_CO, P_CH4, alphaG, x_CO2, x_H2O
+    real(dp) :: tmp
+
+    call solve_gases(T, P, f_O2, mCO2tot, mH2Otot, &
+                     P_H2O, P_H2, P_CO2, P_CO, P_CH4, alphaG, x_CO2, x_H2O, &
+                     ierr)
+
+    tmp = 1000.0_dp*((x*alphaG)/(1.0_dp - alphaG))
+    q_H2O = tmp*(P_H2O/P)
+    q_H2 = tmp*(P_H2/P)
+    q_CO2 = tmp*(P_CO2/P)
+    q_CO = tmp*(P_CO/P)
+    q_CH4 = tmp*(P_CH4/P)
+
+  end subroutine
+
+  !> Computes the composition of gases being expelled from a volcano.
   subroutine solve_gases(T, P, f_O2, mCO2tot, mH2Otot, &
                          P_H2O, P_H2, P_CO2, P_CO, P_CH4, alphaG, x_CO2, x_H2O, &
                          ierr)
@@ -57,8 +128,8 @@ contains
     real(dp), intent(out) :: P_H2O !! Partial pressure of H2O in gas (bar)
     real(dp), intent(out) :: P_H2 !! Partial pressure of H2 in gas (bar)
     real(dp), intent(out) :: P_CO2 !! Partial pressure of CO2 in gas (bar)
-    real(dp), intent(out) :: P_CO !! Partial pressure of CO2 in gas (bar)
-    real(dp), intent(out) :: P_CH4 !! Partial pressure of CO2 in gas (bar)
+    real(dp), intent(out) :: P_CO !! Partial pressure of CO in gas (bar)
+    real(dp), intent(out) :: P_CH4 !! Partial pressure of CH4 in gas (bar)
     real(dp), intent(out) :: alphaG !! (mol gas)/(mol gas and magma)
     real(dp), intent(out) :: x_CO2 !! mol fraction of CO2 in magma after degassing
     real(dp), intent(out) :: x_H2O !! mol fraction of H2O in magma after degassing

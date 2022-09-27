@@ -1,5 +1,5 @@
 program main
-  use volcgases, only: solve_gases, dp
+  use volcgases, only: outgassing_flux, solve_gases, dp
   implicit none
   call test_volcgases()
 contains
@@ -48,6 +48,19 @@ contains
     call assert(alphaG, 0.00316539763088389_dp, 1.0e-10_dp, 'alphaG')
     call assert(x_CO2, 4.2433333552036306e-07_dp, 1.0e-10_dp, 'x_CO2')
     call assert(x_H2O, 0.0018867859399539038_dp, 1.0e-10_dp, 'x_H2O')
+
+    block
+      real(dp) :: F_H2O, F_H2, F_CO2, F_CO, F_CH4, Q
+
+      Q = 1.5e13_dp
+      
+      call outgassing_flux(T, P, f_O2, mCO2tot, mH2Otot, Q, &
+                           F_H2O, F_H2, F_CO2, F_CO, F_CH4, ierr)
+      if (ierr /= 0) then
+        print*,ierr
+        stop 1
+      endif
+    end block
     
   end subroutine
 
