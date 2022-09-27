@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
     name="VolcGases",
     packages=['VolcGases'],
-    version='2.3',
+    version='2.4.0',
     license='MIT',
     install_requires=['numpy','numba','scipy'],
     author = 'Nicholas Wogan',
@@ -17,7 +17,6 @@ setup(
                   'gases produced by a volcano.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    python_requires='>3.6',
     url = "https://github.com/Nicholaswogan/VolcGases",
-    cmake_args=['-DSKBUILD=ON']
-    )
+    cmake_args=['-DSKBUILD=ON', '-DCMAKE_BUILD_TYPE=Release']
+)

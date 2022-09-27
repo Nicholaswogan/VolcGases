@@ -1,0 +1,3 @@
+add_executable(test_volcgases test_volcgases.f90)
+target_link_libraries(test_volcgases volcgases)
+target_include_directories(test_volcgases PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY})

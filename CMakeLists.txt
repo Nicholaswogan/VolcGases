@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.4.0)
-project(VolcGases LANGUAGES Fortran)
+cmake_minimum_required(VERSION "3.14.0")
+project(VOLCGASES LANGUAGES Fortran)
+
+set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules")
 
 option(SKBUILD "Should be ON of being build by skbuild, 
 and OFF of being build by regular cmake" OFF)
@@ -7,25 +9,17 @@ and OFF of being build by regular cmake" OFF)
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+include(cmake/CPM.cmake)
             
-add_library(VolcGasesFort SHARED
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/VolcGasesFort.f90
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/minpack/dpmpar.f
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/minpack/enorm.f
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/minpack/fdjac2.f
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/minpack/lmder.f
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/minpack/lmder1.f
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/minpack/lmdif.f
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/minpack/lmpar.f
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/minpack/qrfac.f
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/minpack/qrsolv.f
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/VolcGasesFort_wrapper.f90)
-            
-set_target_properties(VolcGasesFort PROPERTIES PREFIX "")
-set_target_properties(VolcGasesFort PROPERTIES SUFFIX ".so")
+add_subdirectory(src)
+add_subdirectory(test)
 
 if (SKBUILD)
-  install(TARGETS VolcGasesFort DESTINATION VolcGases)
+  install(TARGETS volcgases DESTINATION VolcGases)
 else()
-  install(TARGETS VolcGasesFort DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/VolcGases/)
+  install(TARGETS volcgases DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/VolcGases/)
 endif()
