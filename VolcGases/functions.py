@@ -66,6 +66,9 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
     
     return P_H2O.item(),P_H2.item(),P_CO2.item(),P_CO.item(),P_CH4.item(),alphaG.item(),x_CO2.item(),x_H2O.item()
 
+# for backwards compatibility
+solve_gases_jit = solve_gases
+
 def degassing_pressure(T,DFMQ,mCO2tot,mH2Otot,P_range = [1e-4,30000]):
     """
     This function determines the overburden pressure where degassing begins.
