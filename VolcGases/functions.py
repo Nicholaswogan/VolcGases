@@ -61,7 +61,6 @@ def solve_gases(T,P,f_O2,mCO2tot,mH2Otot):
                   P_CO.ctypes.data, P_CH4.ctypes.data, alphaG.ctypes.data, \
                   x_CO2.ctypes.data, x_H2O.ctypes.data, ierr.ctypes.data)
     if ierr.item() != 0:
-        print(ierr.item())
         raise Exception('solve_gases failed because of unphysical inputs or non-linear solve failure.')
     
     return P_H2O.item(),P_H2.item(),P_CO2.item(),P_CO.item(),P_CH4.item(),alphaG.item(),x_CO2.item(),x_H2O.item()
